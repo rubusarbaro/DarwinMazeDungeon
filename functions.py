@@ -8,7 +8,7 @@ def clearScreen() :
     else :
         print("Function not compatible with the current os.")
 
-def player_hearts(player) :
+def player_hearts(player: object) :
      hearts = ""
      for i in range(0, player.life) :
           hearts = hearts + "❤️ "

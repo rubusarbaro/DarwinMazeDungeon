@@ -5,13 +5,21 @@ from entities import player
 from functions import clearScreen, player_hearts
 
 import functionalObjects
+import screen
 import styles
 
 clearScreen()
 
 # Objects definition.
 p1 = player()
+main_home = functionalObjects.menu(screen.home, (10, 12))
 maze = functionalObjects.game()
+pointer = functionalObjects.pointer()
+
+pointer.set_position(main_home)
+main_home.print_screen()
+input("Presiona (enter) para continuar...")
+# PENDIENTE TERMINAR DE LA 21 EN ADELANTE.
 
 p1.set_character(maze)
 p1_hearts = player_hearts(p1)
@@ -28,21 +36,17 @@ while True :
           match key.name :
                case "up" :
                     p1.move(maze, movement.UP)
-                    clearScreen()
                     print(styles.regular.bold+"VIDA: "+styles.text.end+p1_hearts, styles.regular.bold+"Posición: "+styles.text.end+"%s, %s" %(p1.position[0], p1.position[1]))
                     maze.print_screen()
                case "down" :
                     p1.move(maze, movement.DOWN)
-                    clearScreen()
                     print(styles.regular.bold+"VIDA: "+styles.text.end+p1_hearts, styles.regular.bold+"Posición: "+styles.text.end+"%s, %s" %(p1.position[0], p1.position[1]))
                     maze.print_screen()
                case "left" :
                     p1.move(maze, movement.LEFT)
-                    clearScreen()
                     print(styles.regular.bold+"VIDA: "+styles.text.end+p1_hearts, styles.regular.bold+"Posición: "+styles.text.end+"%s, %s" %(p1.position[0], p1.position[1]))
                     maze.print_screen()
                case "right" :
                     p1.move(maze, movement.RIGHT)
-                    clearScreen()
                     print(styles.regular.bold+"VIDA: "+styles.text.end+p1_hearts, styles.regular.bold+"Posición: "+styles.text.end+"%s, %s" %(p1.position[0], p1.position[1]))
                     maze.print_screen()
