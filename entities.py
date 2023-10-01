@@ -6,15 +6,15 @@ class player :
         self.life = 3
 
     def set_character(self, screen) :
-        screen[0][self.position[0]][self.position[1]] = self.icon
+        screen.layout[self.position[0]][self.position[1]] = self.icon
     
     def move(self, screen, movement) :
         posible_position = [self.position[0] + movement[0], self.position[1] + movement[1]]
 
-        if posible_position in screen[1] :
+        if posible_position in screen.wall_coordinates :
             return
         else: 
-            screen[0][self.position[0]][self.position[1]] = "⬛️"
+            screen.layout[self.position[0]][self.position[1]] = "⬛️"
             self.position[0] = self.position[0] + movement[0]
             self.position[1] = self.position[1] + movement[1]
             self.set_character(screen)
