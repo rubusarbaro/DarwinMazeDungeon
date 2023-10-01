@@ -1,7 +1,7 @@
 import os
 
 def printScreen(screen) :
-     for line in screen[0] :
+     for line in screen.layout :
           row = ""
           for item in line :
                row = row + item
