@@ -1,5 +1,5 @@
-import gc
 import keyboard
+import os
 
 from actions import movement
 from entities import player
@@ -8,6 +8,10 @@ from functions import clearScreen, player_hearts
 import functionalObjects
 import screen
 import styles
+
+if os.name == "nt" :
+     print(styles.bold.red+"Error: "+styles.text.end+"Este programa no es compatible con Windows, solamente con macOS y Linux.")
+     exit()
 
 clearScreen()
 
