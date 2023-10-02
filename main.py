@@ -1,3 +1,4 @@
+import gc
 import keyboard
 
 from actions import movement
@@ -12,11 +13,15 @@ clearScreen()
 
 # Objects definition.
 p1 = player()
-main_home = functionalObjects.menu(screen.home, (10, 12))
+main_home = functionalObjects.menu(screen.home)
 maze = functionalObjects.game()
 pointer = functionalObjects.pointer()
+button_start = functionalObjects.button("Iniciar")
+button_exit = functionalObjects.button("Salir")
 
-pointer.set_position(main_home)
+button_start.set_position(main_home, 12, 10)
+button_exit.set_position(main_home, 13, 14)
+pointer.set_default_button(main_home, button_start)
 main_home.print_screen()
 input("Presiona (enter) para continuar...")
 # PENDIENTE TERMINAR DE LA 21 EN ADELANTE.
