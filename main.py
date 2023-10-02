@@ -10,6 +10,7 @@ import screen
 import styles
 
 if os.name == "nt" :
+     os.system("COLOR")
      print(styles.bold.red+"Error: "+styles.text.end+"Este programa no es compatible con Windows, solamente con macOS y Linux.")
      exit()
 
