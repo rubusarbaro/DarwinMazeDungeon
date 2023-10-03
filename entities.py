@@ -9,12 +9,12 @@ class player :
         screen.layout[self.position[0]][self.position[1]] = self.icon
     
     def move(self, screen: object, movement) :
-        posible_position = [self.position[0] + movement[0], self.position[1] + movement[1]]
+        possible_position = [self.position[0] + movement[0], self.position[1] + movement[1]]
 
-        if posible_position in screen.wall_coordinates :
+        if possible_position in screen.wall_coordinates :
             return
         else: 
-            screen.layout[self.position[0]][self.position[1]] = "⬛️"
-            self.position[0] = self.position[0] + movement[0]
-            self.position[1] = self.position[1] + movement[1]
+            screen.layout[self.position[0]][self.position[1]] = "  "
+            self.position[0] = possible_position[0]
+            self.position[1] = possible_position[1]
             self.set_character(screen)
