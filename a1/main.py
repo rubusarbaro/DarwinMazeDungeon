@@ -23,33 +23,17 @@ maze = functionalObjects.game()
 pointer = functionalObjects.pointer()
 button_start = functionalObjects.button("Iniciar")
 button_exit = functionalObjects.button("Salir")
+button_test1 = functionalObjects.button("Botón de prueba")
 
 button_start.set_position(main_home, 12, 10)
 button_exit.set_position(main_home, 13, 14)
+button_test1.set_position(main_home, 7, 18)
 pointer.set_default_button(main_home, button_start)
 main_home.print_screen()
 
-"""
 while True :
-     key = keyboard.read_event()
-
-     if key.name == "esc" :
-          exit()
-     elif key.event_type == keyboard.KEY_DOWN :
-          match key.name :
-               case "up" :
-                    pointer.move(movement.UP)
-                    main_home.print_screen()
-               case "down" :
-                    pointer.move(movement.DOWN)
-                    main_home.print_screen()
-               case "left" :
-                    pointer.move(movement.LEFT)
-                    main_home.print_screen()
-               case "right" :
-                    pointer.move(movement.RIGHT)
-                    main_home.print_screen()
-"""
+     pointer.next_button_axis_y()
+     main_home.print_screen()
                     
 p1.set_character(maze)
 p1_hearts = player_hearts(p1)

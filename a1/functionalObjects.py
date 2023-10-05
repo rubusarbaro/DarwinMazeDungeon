@@ -1,3 +1,5 @@
+import keyboard
+
 from functions import clearScreen
 from screen import maze as maze_layout
 from styles import backgroung, text
@@ -13,6 +15,8 @@ class screen(object) :
     def __init__(self) :
         list_screens.append(self)
         self.layout = []
+        self.layout_height = len(self.layout)
+        self.layout_width = len(self.layout[0])
         self.wall_coordinates = self.get_wall_coordinates()
     
     def print_screen(self) :
@@ -24,12 +28,10 @@ class screen(object) :
             print(row)
 
     def get_wall_coordinates(self) :
-        layout_height = len(self.layout)
-        layout_width = len(self.layout[0])
 
         wall_coordinates = []
-        for y in range (0, layout_height) :
-            for x in range (0, layout_width) :
+        for y in range (0, self.layout_height) :
+            for x in range (0, self.layout_width) :
                 if self.layout[y][x] == "⬜" :
                     wall_coordinates.append([y, x])
         
@@ -39,12 +41,16 @@ class menu(screen) :
     def __init__(self, screen: list):
         list_menus.append(self)
         self.layout = screen
+        self.layout_height = len(self.layout)
+        self.layout_width = len(self.layout[0])
         self.wall_coordinates = self.get_wall_coordinates()
 
 class game(screen) :
     def __init__(self) :
         list_games.append(self)
         self.layout = maze_layout
+        self.layout_height = len(self.layout)
+        self.layout_width = len(self.layout[0])
         self.wall_coordinates = self.get_wall_coordinates()
 
 class pointer :
@@ -54,12 +60,14 @@ class pointer :
         self.position_x = 0
         self.position_y = 0
         self.rel_screen = object
+        self.current_button = object
 
     def set_default_button(self, screen: object, button: object) :
-        self.position_x = button.init_position_x -2
-        self.position_y = button.init_position_y
+        self.position_x = button.position_x -2
+        self.position_y = button.position_y
         self.rel_screen = screen
         screen.layout[self.position_y][self.position_x] = self.icon
+        self.current_button = button
         self.select_button()
 
     def select_button(self) :
@@ -80,6 +88,35 @@ class pointer :
 
             self.rel_screen.layout[self.position_y][self.position_x] = self.icon
 
+    def next_button_axis_y(self) : #ERROR: Pendiente por terminar
+
+        """
+        while True :
+            key = keyboard.read_event()
+
+            if key.event_type == keyboard.KEY_DOWN :
+                    if key.name == "up" or key.name == "left" :
+                        y_counter = 1
+                        for any in list_buttons :
+                            if any.rel_screen == self.rel_screen and any.position_y == self.position_y - y_counter :
+                                self.rel_screen.layout[self.position_y][self.position_x] = "  "
+                                self.current_button.unselect()
+                                self.set_default_button(self.rel_screen, any)
+                                break
+                            else :
+                                y_counter = y_counter + 1
+                    if key.name == "down" or key.name == "right" :
+                        y_counter = 1
+                        for any in list_buttons :
+                            if any.rel_screen == self.rel_screen and any.position_y == self.position_y + y_counter :
+                                self.rel_screen.layout[self.position_y][self.position_x] = "  "
+                                self.current_button.unselect()
+                                self.set_default_button(self.rel_screen, any)
+                                break
+                            else :
+                                y_counter = y_counter + 1
+        """
+
 class button :
     def __init__(self, text: str, ) :
         list_buttons.append(self)
@@ -91,19 +128,19 @@ class button :
         for i in range(0, self.text_len) :
             self.text_as_list.append(" %s" %(self.text[i]))
 
-        self.init_position_x = 0
-        self.init_position_y = 0
+        self.position_x = 0
+        self.position_y = 0
 
     def set_position(self, screen: object, position_x: int, position_y: int) :
         for i in range(0, self.text_len) :
             screen.layout[position_y][position_x+i] = self.text_as_list[i]
-        self.init_position_x = position_x
-        self.init_position_y = position_y
+        self.position_x = position_x
+        self.position_y = position_y
         self.rel_screen = screen
     
     def is_selected(self) :
         for any in list_pointers :
-            if (any.rel_screen, any.position_y, any.position_x) == (self.rel_screen, self.init_position_y, self.init_position_x - 2) :
+            if (any.rel_screen, any.position_y, any.position_x) == (self.rel_screen, self.position_y, self.position_x - 2) :
                 return True
         return False
     
@@ -111,6 +148,11 @@ class button :
         counter = 0
         for letter in self.text_as_list :
             letter = backgroung.classic + letter + text.end
-            self.rel_screen.layout[self.init_position_y][self.init_position_x+counter] = letter
+            self.rel_screen.layout[self.position_y][self.position_x+counter] = letter
             counter = counter + 1
-
+    
+    def unselect(self) :
+        counter = 0
+        for letter in self.text_as_list :
+            self.rel_screen.layout[self.position_y][self.position_x+counter] = letter
+            counter = counter + 1
