@@ -1,9 +1,14 @@
+# Imports modules
+import keyboard
+
 # Imports local modules.
 from functions import clear_screen
+from styles import backgroung, text
 
 # Created object lists.
 list_buttons = []
 list_labels = []
+list_pointers = []
 list_screens = []
 
 
@@ -127,7 +132,7 @@ class label :
         """
         It adds the text (label) to the assigned screen.
         The target screen, and the position (x and y) of the label has to be provided.
-        "Screen" is object type. "position_x" and "position_y" are integer type.
+        "screen" is object type. "position_x" and "position_y" are integer type.
         """
 
         # Assigns the declared screen as related_screen to the object
@@ -158,6 +163,10 @@ class button :
         self.text = text
         self.related_screen = None
         self.style = style
+        self.text_as_list = self.style(self)
+        
+        self.position_x = 0
+        self.position_y = 0
 
     def regular(self) :
         """
@@ -205,21 +214,124 @@ class button :
         return text_as_list
 
     def set_in_screen(self, screen: object, position_x: int, position_y: int) :
+        """
+        It adds the button to the assigned screen.
+        The target screen, and the position (x and y) of the button has to be provided.
+        "screen" is object type. "position_x" and "position_y" are integer type.
+        """
 
-        """
-        It adds the text (label) to the assigned screen.
-        The target screen, and the position (x and y) of the label has to be provided.
-        "Screen" is object type. "position_x" and "position_y" are integer type.
-        """
+        self.position_x = position_x
+        self.position_y = position_y
 
         # Assigns the declared screen as related_screen to the object
         self.related_screen = screen
-        # Defines the "text_as_list" values according to "label.regular" or "label.title"
-        text_as_list = self.style(self)
 
         # Substitutes every item in the list in the target position.
-        for i in range(0, len(text_as_list)) :
-            screen.layout[position_y][position_x + i] = text_as_list[i]
+        for i in range(0, len(self.text_as_list)) :
+            screen.layout[self.position_y][self.position_x + i] = self.text_as_list[i]
 
         # Adds the current label to a list in the screen, to keep a track of the assigned objects.
         screen.objects_in_screen.append(self)
+
+    def select(self) :
+        """
+        Underlines text in button when is selected by a pointer.
+        """
+
+        counter = 0
+        # Iterates every item in the list, then it changes its format accorfing to "styles" module.
+        for letter in self.text_as_list :
+            letter = backgroung.classic + letter + text.end
+            self.related_screen.layout[self.position_y][self.position_x + counter] = letter
+            counter = counter + 1
+
+    def unselect(self) :
+        """
+        Returns the text to the original format.
+        """
+
+        counter = 0
+        # Iterates every item in the list, then it changes its format accorfing to "styles" module.
+        for letter in self.text_as_list :
+            self.related_screen.layout[self.position_y][self.position_x + counter] = letter
+            counter = counter + 1
+
+
+class pointer :
+    """
+    Initialize an object of "pointer" class.
+    """
+
+    def __init__(self) :
+        # Appends the created object to the list.
+        list_pointers.append(self)
+        
+        self.icon = "->"
+        self.related_screen = None
+        self.related_button = None
+
+    def set_in_screen(self, screen: object, default_button: object) :
+        """
+        It adds the button to the assigned screen.
+        """
+        self.related_screen = screen
+        self.related_button = default_button
+
+        self.select_button(self.related_button)
+        screen.objects_in_screen.append(self)
+
+    def clear(self) :
+        """
+        It erase the pointer from the screen without unlinking it.
+        """
+
+        position_x = self.related_button.position_x - 2
+        position_y = self.related_button.position_y
+
+        self.related_screen.layout[position_y][position_x] = "  "
+    
+    def select_button(self, button: object) :
+        """
+        It sets the pointer to a button.
+        A button has to be provided.
+        """
+
+        # Set the position variables for the pointer.
+        position_x = button.position_x - 2
+        position_y = button.position_y
+
+        #Set the pointer in the screen.
+        self.related_screen.layout[position_y][position_x] = self.icon
+
+        # Change the button format with "select" method.
+        button.select()
+
+    def move_to_next(self) :
+        """
+        Move the position of the button to the next.
+        """
+
+        in_screen_buttons = {}
+        for button in list_buttons :
+            if button.related_screen == self.related_screen :
+                in_screen_buttons[button.position_y] = button
+
+        while True:
+            key = keyboard.read_event()
+        
+            if key.name == "esc" :
+                exit()
+            elif key.name == "enter" :
+                print("Botón presionado")
+                exit()
+            else :
+                match key.name :
+                    case "up" | "left" :
+                        self.related_button.unselect()
+                        self.clear()
+                        print("Botón anterior.")
+                    case "down" | "right" :
+                        self.related_button.unselect()
+                        self.clear()
+                        print("Siguiente botón.")
+                self.related_screen.print_screen()

@@ -59,13 +59,13 @@ class pointer :
         self.icon = "->"
         self.position_x = 0
         self.position_y = 0
-        self.rel_screen = object
+        self.related_screen = object
         self.current_button = object
 
     def set_default_button(self, screen: object, button: object) :
         self.position_x = button.position_x -2
         self.position_y = button.position_y
-        self.rel_screen = screen
+        self.related_screen = screen
         screen.layout[self.position_y][self.position_x] = self.icon
         self.current_button = button
         self.select_button()
@@ -79,14 +79,14 @@ class pointer :
         possible_position_y = self.position_y + movement[0]
         possible_position_x = self.position_x + movement[1]
 
-        if (possible_position_y, possible_position_x) in self.rel_screen.wall_coordinates :
+        if (possible_position_y, possible_position_x) in self.related_screen.wall_coordinates :
             return
         else :
-            self.rel_screen.layout[self.position_y][self.position_x] = "  "
+            self.related_screen.layout[self.position_y][self.position_x] = "  "
             self.position_y = possible_position_y
             self.position_x = possible_position_x
 
-            self.rel_screen.layout[self.position_y][self.position_x] = self.icon
+            self.related_screen.layout[self.position_y][self.position_x] = self.icon
 
     def next_button_axis_y(self) : #ERROR: Pendiente por terminar
 
@@ -98,20 +98,20 @@ class pointer :
                     if key.name == "up" or key.name == "left" :
                         y_counter = 1
                         for any in list_buttons :
-                            if any.rel_screen == self.rel_screen and any.position_y == self.position_y - y_counter :
-                                self.rel_screen.layout[self.position_y][self.position_x] = "  "
+                            if any.related_screen == self.related_screen and any.position_y == self.position_y - y_counter :
+                                self.related_screen.layout[self.position_y][self.position_x] = "  "
                                 self.current_button.unselect()
-                                self.set_default_button(self.rel_screen, any)
+                                self.set_default_button(self.related_screen, any)
                                 break
                             else :
                                 y_counter = y_counter + 1
                     if key.name == "down" or key.name == "right" :
                         y_counter = 1
                         for any in list_buttons :
-                            if any.rel_screen == self.rel_screen and any.position_y == self.position_y + y_counter :
-                                self.rel_screen.layout[self.position_y][self.position_x] = "  "
+                            if any.related_screen == self.related_screen and any.position_y == self.position_y + y_counter :
+                                self.related_screen.layout[self.position_y][self.position_x] = "  "
                                 self.current_button.unselect()
-                                self.set_default_button(self.rel_screen, any)
+                                self.set_default_button(self.related_screen, any)
                                 break
                             else :
                                 y_counter = y_counter + 1
@@ -123,7 +123,7 @@ class button :
         self.text = text
         self.text_len = len(self.text)
         self.text_as_list = []
-        self.rel_screen = object
+        self.related_screen = object
 
         for i in range(0, self.text_len) :
             self.text_as_list.append(" %s" %(self.text[i]))
@@ -136,11 +136,11 @@ class button :
             screen.layout[position_y][position_x+i] = self.text_as_list[i]
         self.position_x = position_x
         self.position_y = position_y
-        self.rel_screen = screen
+        self.related_screen = screen
     
     def is_selected(self) :
         for any in list_pointers :
-            if (any.rel_screen, any.position_y, any.position_x) == (self.rel_screen, self.position_y, self.position_x - 2) :
+            if (any.related_screen, any.position_y, any.position_x) == (self.related_screen, self.position_y, self.position_x - 2) :
                 return True
         return False
     
@@ -148,11 +148,11 @@ class button :
         counter = 0
         for letter in self.text_as_list :
             letter = backgroung.classic + letter + text.end
-            self.rel_screen.layout[self.position_y][self.position_x+counter] = letter
+            self.related_screen.layout[self.position_y][self.position_x+counter] = letter
             counter = counter + 1
     
     def unselect(self) :
         counter = 0
         for letter in self.text_as_list :
-            self.rel_screen.layout[self.position_y][self.position_x+counter] = letter
+            self.related_screen.layout[self.position_y][self.position_x+counter] = letter
             counter = counter + 1
