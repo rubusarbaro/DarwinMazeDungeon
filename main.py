@@ -1,6 +1,16 @@
+# Import modules
+import os
+
 # Import local modules
-from screen import blank
 from functional_objects import button, label, pointer, screen
+from functions import clear_screen
+from screen import blank
+
+# Checks if the system is Windows. If it is, it prints an error and exits.
+if os.name == "nt" :
+     os.system("COLOR")
+     print(styles.bold.red+"Error: "+styles.text.end+"Este programa no es compatible con Windows, solamente con macOS y Linux.")
+     exit()
 
 # Creates objects used in menu.
 home_screen = screen(blank)

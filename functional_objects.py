@@ -323,37 +323,37 @@ class pointer :
         
             if key.name == "esc" :
                 exit()
-            elif key.name == "enter" :
+            if key.name == "enter" :
                 print("Botón presionado")
                 exit()
-            else :
-                match key.name :
-                    case "up" | "left" :
-                        self.related_button.unselect()
-                        self.clear()
 
-                        relative_position_y =self.related_button.position_y - 1
-                        for i in range(0, relative_position_y) :
-                            if relative_position_y - i in in_screen_buttons :
-                                self.related_button = in_screen_buttons[relative_position_y - i]
-                                new_position_x = self.related_button.position_x - 2
-                                new_position_y = self.related_button.position_y
-                        
-                                self.select_button(self.related_button)
-                                self.related_screen.layout[new_position_y][new_position_x] = self.icon
-                    case "down" | "right" :
-                        self.related_button.unselect()
-                        self.clear()
+            match key.name :
+                case "up" | "left" :
+                    self.related_button.unselect()
+                    self.clear()
 
-                        relative_position_y = self.related_button.position_y + 1
-                        iterative = layout_height - self.related_button.position_y
-                        for i in range(0, iterative) :
-                            if relative_position_y + i in in_screen_buttons :
-                                self.related_button = in_screen_buttons[relative_position_y + i]
-                                new_position_x = self.related_button.position_x - 2
-                                new_position_y = self.related_button.position_y
+                    relative_position_y =self.related_button.position_y - 1
+                    for i in range(0, relative_position_y) :
+                        if relative_position_y - i in in_screen_buttons :
+                            self.related_button = in_screen_buttons[relative_position_y - i]
+                            new_position_x = self.related_button.position_x - 2
+                            new_position_y = self.related_button.position_y
                         
-                                self.select_button(self.related_button)
-                                self.related_screen.layout[new_position_y][new_position_x] = self.icon
-                break
-        self.related_screen.print_screen()
+                            self.select_button(self.related_button)
+                            self.related_screen.layout[new_position_y][new_position_x] = self.icon
+                case "down" | "right" :
+                    self.related_button.unselect()
+                    self.clear()
+
+                    relative_position_y = self.related_button.position_y + 1
+                    iterative = layout_height - self.related_button.position_y
+                    for i in range(0, iterative) :
+                        if relative_position_y + i in in_screen_buttons :
+                            self.related_button = in_screen_buttons[relative_position_y + i]
+                            new_position_x = self.related_button.position_x - 2
+                            new_position_y = self.related_button.position_y
+                        
+                            self.select_button(self.related_button)
+                            self.related_screen.layout[new_position_y][new_position_x] = self.icon
+            
+            self.related_screen.print_screen()
