@@ -71,7 +71,7 @@ class label :
         list_labels.append(self)
 
         self.text = text
-        self.related_screen = object
+        self.related_screen = None
         self.style = style
 
     def regular(self) :
