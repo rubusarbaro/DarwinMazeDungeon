@@ -1,5 +1,11 @@
 import os
 
+def select_player() :
+    import select_player
+
+def start_game() :
+    import main_game
+
 def clear_screen() :
 
     """

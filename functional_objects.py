@@ -1,7 +1,7 @@
-# Imports modules
+# Import modules
 import keyboard
 
-# Imports local modules.
+# Import local modules.
 from functions import clear_screen
 from styles import backgroung, text
 
@@ -20,7 +20,7 @@ class screen :
 
     def __init__(self, layout: list) :
 
-        # Appends the created object to the list.
+        # Append the created object to the list.
         list_screens.append(self)
 
         self.layout = layout
@@ -54,7 +54,7 @@ class screen :
         Print the layout in the "screen" class object.
         """
 
-        # Cleans the last screen printed.    
+        # Clean the last screen printed.    
         clear_screen()
 
         # First, it iterates every sublist in the list "layout". Then, it iterates every item in the sublist.
@@ -75,7 +75,7 @@ class label :
 
     def __init__(self, text: str, style) :
 
-        # Appends the created object to the list.
+        # Append the created object to the list.
         list_labels.append(self)
 
         self.text = text
@@ -88,7 +88,7 @@ class label :
         It returns the text in a list of two letters per item.
         """
 
-        # Gets the lenght of the text and creates a list where every pair of letter are stored.
+        # Get the lenght of the text and creates a list where every pair of letter are stored.
         text_len = len(self.text)
         text_as_list = []
 
@@ -115,7 +115,7 @@ class label :
         It returns the text in a list of one letter and one space per item.
         """
 
-        # Gets the lenght of the text and creates a list where every pair of letter are stored.
+        # Get the lenght of the text and creates a list where every pair of letter are stored.
         text_len = len(self.text)
         text_as_list = []
 
@@ -155,9 +155,9 @@ class button :
     The available styles are "regular" and "spaced".
     """
 
-    def __init__(self, text: str, style) :
+    def __init__(self, text: str, style, action) :
 
-        # Appends the created object to the list.
+        # Append the created object to the list.
         list_buttons.append(self)
 
         self.text = text
@@ -168,13 +168,16 @@ class button :
         self.position_x = 0
         self.position_y = 0
 
+        self.is_selected = False
+        self.action = action
+
     def regular(self) :
         """
         Text without format, as it was initialized.
         It returns the text in a list of two letters per item.
         """
 
-        # Gets the lenght of the text and creates a list where every pair of letter are stored.
+        # Get the lenght of the text and creates a list where every pair of letter are stored.
         text_len = len(self.text)
         text_as_list = []
 
@@ -201,7 +204,7 @@ class button :
         It returns the text in a list of one letter and one space per item.
         """
 
-        # Gets the lenght of the text and creates a list where every pair of letter are stored.
+        # Get the lenght of the text and creates a list where every pair of letter are stored.
         text_len = len(self.text)
         text_as_list = []
 
@@ -223,14 +226,14 @@ class button :
         self.position_x = position_x
         self.position_y = position_y
 
-        # Assigns the declared screen as related_screen to the object
+        # Assign the declared screen as related_screen to the object
         self.related_screen = screen
 
-        # Substitutes every item in the list in the target position.
+        # Substitute every item in the list in the target position.
         for i in range(0, len(self.text_as_list)) :
             screen.layout[self.position_y][self.position_x + i] = self.text_as_list[i]
 
-        # Adds the current label to a list in the screen, to keep a track of the assigned objects.
+        # Add the current label to a list in the screen, to keep a track of the assigned objects.
         screen.objects_in_screen.append(self)
 
     def select(self) :
@@ -239,11 +242,13 @@ class button :
         """
 
         counter = 0
-        # Iterates every item in the list, then it changes its format accorfing to "styles" module.
+        # Iterate every item in the list, then it changes its format accorfing to "styles" module.
         for letter in self.text_as_list :
             letter = backgroung.classic + letter + text.end
             self.related_screen.layout[self.position_y][self.position_x + counter] = letter
             counter = counter + 1
+        
+        self.is_selected = True
 
     def unselect(self) :
         """
@@ -251,10 +256,12 @@ class button :
         """
 
         counter = 0
-        # Iterates every item in the list, then it changes its format accorfing to "styles" module.
+        # Iterate every item in the list, then it changes its format accorfing to "styles" module.
         for letter in self.text_as_list :
             self.related_screen.layout[self.position_y][self.position_x + counter] = letter
             counter = counter + 1
+
+        self.is_selected = False
 
 
 class pointer :
@@ -263,7 +270,7 @@ class pointer :
     """
 
     def __init__(self) :
-        # Appends the created object to the list.
+        # Append the created object to the list.
         list_pointers.append(self)
         
         self.icon = "->"
@@ -311,49 +318,83 @@ class pointer :
         Move the position of the button to the next.
         """
 
+        # Calculate the height of the layout to determine the possible quantity of buttons in a screen.
         layout_height = len(self.related_screen.layout[0])
 
+        # Create a dictionary of all the buttons in the screen. The key is button.position_y
         in_screen_buttons = {}
         for button in list_buttons :
             if button.related_screen == self.related_screen :
                 in_screen_buttons[button.position_y] = button
 
+        # It iterates until one of two conditions is met: "esc" key pressed or "enter" key pressed when selected a button.
         while True:
             key = keyboard.read_event()
         
+            # If "esc" key is pressed, it finish the program.
             if key.name == "esc" :
                 exit()
+
+            # If "enter" key us pressed, it executes the action in the button.
+            # It determines what button is selected based on the screen and position_y of the button and the pointer.
             if key.name == "enter" :
-                print("Botón presionado")
-                exit()
+                for button in list_buttons :
+                    if button.related_screen == self.related_screen and button.position_y == self.related_button.position_y :
+                        button.action()
+                        return
 
-            match key.name :
-                case "up" | "left" :
-                    self.related_button.unselect()
-                    self.clear()
+            # If a key is pressed, it compares the following conditions:
+            if key.event_type == keyboard.KEY_DOWN :
+                match key.name :
 
-                    relative_position_y =self.related_button.position_y - 1
-                    for i in range(0, relative_position_y) :
-                        if relative_position_y - i in in_screen_buttons :
-                            self.related_button = in_screen_buttons[relative_position_y - i]
-                            new_position_x = self.related_button.position_x - 2
-                            new_position_y = self.related_button.position_y
-                        
-                            self.select_button(self.related_button)
-                            self.related_screen.layout[new_position_y][new_position_x] = self.icon
-                case "down" | "right" :
-                    self.related_button.unselect()
-                    self.clear()
+                    # If key name is "up" or "left", it searches the buttons above the selected one.
+                    # This only works in macOS and probably in Linux too. It's necessary find a solution for Windows.
+                    case "up" | "left" :
 
-                    relative_position_y = self.related_button.position_y + 1
-                    iterative = layout_height - self.related_button.position_y
-                    for i in range(0, iterative) :
-                        if relative_position_y + i in in_screen_buttons :
-                            self.related_button = in_screen_buttons[relative_position_y + i]
-                            new_position_x = self.related_button.position_x - 2
-                            new_position_y = self.related_button.position_y
-                        
-                            self.select_button(self.related_button)
-                            self.related_screen.layout[new_position_y][new_position_x] = self.icon
-            
-            self.related_screen.print_screen()
+                        # It sets a relative position_y to start to find the possible buttons above the current.
+                        # It iterates a range from 0 to reltive_position_y. For each iteration, it searches in the dictionary if there's
+                        # a key with the position_y (for example: 9, 8, 7, 6, 5...) When it finds it, it select the first.
+                        relative_position_y = self.related_button.position_y - 1
+                        for i in range(0, relative_position_y) :
+                            if relative_position_y - i in in_screen_buttons :
+                                # First, it unselect the current button and erase the pointer from its current position.
+                                self.related_button.unselect()
+                                self.clear()
+
+                                # It changes the current related button (of the pointer) by the new, the it changes its position
+                                # to the button's one.
+                                self.related_button = in_screen_buttons[relative_position_y - i]
+                                new_position_x = self.related_button.position_x - 2
+                                new_position_y = self.related_button.position_y
+                            
+                                # It selects the new button and set the new position for the pointer.
+                                self.select_button(self.related_button)
+                                self.related_screen.layout[new_position_y][new_position_x] = self.icon
+
+                    # If key name is "down" or "right", it searches the buttons below the selected one.
+                    # This only works in macOS and probably in Linux too. It's necessary find a solution for Windows.     
+                    case "down" | "right" :
+
+                        # It sets a relative position_y to start to find the possible buttons below the current.
+                        # It iterates a range from 0 to reltive_position_y. For each iteration, it searches in the dictionary if there's
+                        # a key with the position_y (for example: 10, 11, 12, 13, 14...) When it finds it, it select the first.
+                        relative_position_y = self.related_button.position_y + 1
+                        iterative = layout_height - self.related_button.position_y
+                        for i in range(0, iterative) :
+                            if relative_position_y + i in in_screen_buttons :
+                                # First, it unselect the current button and erase the pointer from its current position.
+                                self.related_button.unselect()
+                                self.clear()
+                                
+                                # It changes the current related button (of the pointer) by the new, the it changes its position
+                                # to the button's one.
+                                self.related_button = in_screen_buttons[relative_position_y + i]
+                                new_position_x = self.related_button.position_x - 2
+                                new_position_y = self.related_button.position_y
+
+                                # It selects the new button and set the new position for the pointer.
+                                self.select_button(self.related_button)
+                                self.related_screen.layout[new_position_y][new_position_x] = self.icon
+                
+                #Finally, it prints the screen with the new positions.
+                self.related_screen.print_screen()
