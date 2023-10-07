@@ -1,4 +1,5 @@
 # Import modules
+from copy import deepcopy
 import keyboard
 
 # Import local modules.
@@ -23,7 +24,7 @@ class screen :
         # Append the created object to the list.
         list_screens.append(self)
 
-        self.layout = layout
+        self.layout = deepcopy(layout) # Deepcopy used to avoid that all changes in the layout affects the original.
         self.width = len(self.layout[0])
         self.height = len(self.layout)
         self.wall_coordinates = self.get_layout_wall_coordinates()
