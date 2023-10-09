@@ -4,10 +4,11 @@ import keyboard
 
 # Import local modules.
 from functions import clear_screen
-from styles import backgroung, text
+from styles import bold, background, text
 
 # Created object lists.
 list_buttons = []
+list_input_box = []
 list_labels = []
 list_pointers = []
 list_screens = []
@@ -83,6 +84,9 @@ class label :
         self.related_screen = None
         self.style = style
 
+        self.position_x = 0
+        self.position_y = 0
+
     def regular(self) :
         """
         Text without format, as it was initialized.
@@ -136,6 +140,10 @@ class label :
         "screen" is object type. "position_x" and "position_y" are integer type.
         """
 
+        # Store the postion atributes in the object's.
+        self.position_x = position_x
+        self.position_y = position_y
+
         # Assigns the declared screen as related_screen to the object
         self.related_screen = screen
         # Defines the "text_as_list" values according to "label.regular" or "label.title"
@@ -143,7 +151,7 @@ class label :
 
         # Substitutes every item in the list in the target position.
         for i in range(0, len(text_as_list)) :
-            screen.layout[position_y][position_x + i] = text_as_list[i]
+            screen.layout[self.position_y][self.position_x + i] = text_as_list[i]
 
         # Adds the current label to a list in the screen, to keep a track of the assigned objects.
         screen.objects_in_screen.append(self)
@@ -245,7 +253,7 @@ class button :
         counter = 0
         # Iterate every item in the list, then it changes its format accorfing to "styles" module.
         for letter in self.text_as_list :
-            letter = backgroung.classic + letter + text.end
+            letter = background.classic + letter + text.end
             self.related_screen.layout[self.position_y][self.position_x + counter] = letter
             counter = counter + 1
         
@@ -399,3 +407,98 @@ class pointer :
                 
                 #Finally, it prints the screen with the new positions.
                 self.related_screen.print_screen()
+
+class textbox :
+    """
+    Initialize an object of "input_box" class.
+    A size value (character) has to be provided to initializate the object.
+    """
+
+    def __init__(self, size: int) :
+        list_input_box.append(self)
+
+        self.position_x = 0
+        self.position_y = 0
+        self.size = size
+        self.layout = self.build_layout()
+
+        self.related_screen = None
+        self.related_label = None
+    
+    def build_layout(self) :
+        """
+        It builds the textbox accoriding to the length provided when initializated.
+        """
+
+        # If the size provided is minor to 1, it sets the value to 1.
+        if self.size < 1 :
+            self.size = 1
+
+        # Creates a row with the first line of the box. Size is determined by the provided at inizialization.
+        line1 = " "
+        line1_end = " "
+        for i in range(0, self.size) :
+            line1 = line1 + "_"
+        line1 = line1 + line1_end
+
+        # Creates a row with the second line of the box. Size is determined by the provided at inizialization.
+        line2 = "⎢"
+        line2_end = "⎪"
+        for i in range(0, self.size) :
+            line2 = line2 + " "
+        line2 = line2 + line2_end
+
+        # Creates a row with the third line of the box. Size is determined by the provided at inizialization.
+        line3 = " "
+        line3_end = " "
+        for i in range(0, self.size) :
+            line3 = line3 + "⎺"
+        line3 = line3 + line3_end
+
+        lines = [line1, line2, line3]
+
+        box = []
+        absolute_textbox_len = self.size + 2
+        for line in lines :
+            row = []
+            for i in range(0, absolute_textbox_len // 2) :
+                a = i * 2
+                b = a + 1
+
+                string = line[a] + line[b]
+                row.append(string)
+
+            if absolute_textbox_len // 2 != absolute_textbox_len / 2 :
+                string = line[absolute_textbox_len - 1] + " "
+                row.append(string)
+
+            box.append(row)             
+        
+        return box
+
+    def set_in_screen(self, label: object) :
+        """
+        It sets the textbox in the screen according to the postion of the label in the screen.
+        A label has to be provided when initialized. 
+        """
+
+        self.related_label = label
+        self.related_screen = label.related_screen
+
+        label_len = len(label.text)
+        if label_len //2 != label_len / 2 :
+            label_len = label_len + 1
+        label_relative_len = label_len / 2
+            
+        self.position_x = label.position_x + int(label_relative_len) + 1
+        self.position_y = label.position_y
+
+        try :
+            row_counter = -1
+            for row in self.layout :
+                for i in range(0, len(row)) :
+                    self.related_screen.layout[self.position_y + row_counter][self.position_x + i] = row[i]
+                row_counter = row_counter + 1
+        except :
+            print(bold.red+"Error: "+text.end+"The size of the textbox is larger than the screen layout.")
+            exit()

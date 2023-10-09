@@ -26,5 +26,5 @@ class underline(text) :
     red = "\033[4;31m"
     yellow = "\033[4;33m"
 
-class backgroung(text) :
+class background(text) :
     classic = "\033[0;30m\033[47m"
