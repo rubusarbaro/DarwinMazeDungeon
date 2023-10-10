@@ -531,9 +531,11 @@ class textbox :
             if key.event_type == keyboard.KEY_DOWN and key.name is not None :
                 if key.name.isalnum() :
                     self.value += key.name
+                    text_in_box.text = self.value
                     text_in_box.set_in_screen(self.related_screen, self.position_x + 1, self.position_y)
                     self.related_screen.print_screen()
                 elif key.name == "enter":
                     return
                 elif key.name == "delete":
                     pass
+            print(bold.red + self.value + text.end) #Solo con el fin de identificar qué valor se está almacenando.
