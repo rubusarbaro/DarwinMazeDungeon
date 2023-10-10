@@ -22,3 +22,4 @@ player_name_input.set_in_screen(player_name_label)
 
 #Print screens.
 main_screen.print_screen()
+player_name_input.write_in()

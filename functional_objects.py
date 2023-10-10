@@ -64,7 +64,7 @@ class screen :
         for line in self.layout :
             row = ""
             for item in line :
-                row = row + item
+                row += item
             print(row)
 
 
@@ -255,7 +255,7 @@ class button :
         for letter in self.text_as_list :
             letter = background.classic + letter + text.end
             self.related_screen.layout[self.position_y][self.position_x + counter] = letter
-            counter = counter + 1
+            counter += 1
         
         self.is_selected = True
 
@@ -268,7 +268,7 @@ class button :
         # Iterate every item in the list, then it changes its format accorfing to "styles" module.
         for letter in self.text_as_list :
             self.related_screen.layout[self.position_y][self.position_x + counter] = letter
-            counter = counter + 1
+            counter += 1
 
         self.is_selected = False
 
@@ -421,9 +421,12 @@ class textbox :
         self.position_y = 0
         self.size = size
         self.layout = self.build_layout()
+        self.legend = None
 
         self.related_screen = None
         self.related_label = None
+
+        self.value = ""
     
     def build_layout(self) :
         """
@@ -438,22 +441,22 @@ class textbox :
         line1 = " "
         line1_end = " "
         for i in range(0, self.size) :
-            line1 = line1 + "_"
-        line1 = line1 + line1_end
+            line1 += "_"
+        line1 += line1_end
 
         # Creates a row with the second line of the box. Size is determined by the provided at inizialization.
         line2 = "⎢"
         line2_end = "⎪"
         for i in range(0, self.size) :
-            line2 = line2 + " "
-        line2 = line2 + line2_end
+            line2 += " "
+        line2 += line2_end
 
         # Creates a row with the third line of the box. Size is determined by the provided at inizialization.
         line3 = " "
         line3_end = " "
         for i in range(0, self.size) :
-            line3 = line3 + "⎺"
-        line3 = line3 + line3_end
+            line3 += "⎺"
+        line3 += line3_end
 
         lines = [line1, line2, line3]
 
@@ -479,7 +482,7 @@ class textbox :
     def set_in_screen(self, label: object) :
         """
         It sets the textbox in the screen according to the postion of the label in the screen.
-        A label has to be provided when initialized. 
+        A label has to be provided. 
         """
 
         self.related_label = label
@@ -498,7 +501,39 @@ class textbox :
             for row in self.layout :
                 for i in range(0, len(row)) :
                     self.related_screen.layout[self.position_y + row_counter][self.position_x + i] = row[i]
-                row_counter = row_counter + 1
+                row_counter += 1
         except :
             print(bold.red+"Error: "+text.end+"The size of the textbox is larger than the screen layout.")
             exit()
+
+    def set_legend(self, message: str) :
+        """
+        Set an explanatory legend. It's optional.
+        """
+
+        self.legend = message
+    
+    def write_in(self) :
+        """
+        It allows user to write in the textbox.
+        """
+
+        # If a legend is provided, it will print it below the textbox.
+        if self.legend != None :
+            legend = label(self.legend)
+            legend.set_in_screen(self.related_screen, self.position_x, self.position_y + 2)
+
+        text_in_box = label(None, label.regular)
+
+        while True :
+            key = keyboard.read_event()
+
+            if key.event_type == keyboard.KEY_DOWN and key.name is not None :
+                if key.name.isalnum() :
+                    self.value += key.name
+                    text_in_box.set_in_screen(self.related_screen, self.position_x + 1, self.position_y)
+                    self.related_screen.print_screen()
+                elif key.name == "enter":
+                    return
+                elif key.name == "delete":
+                    pass
