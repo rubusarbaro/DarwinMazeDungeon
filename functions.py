@@ -1,3 +1,4 @@
+from pynput import keyboard
 import os
 
 def select_player() :
@@ -21,3 +22,6 @@ def clear_screen() :
     # If a system doesn't match any of this conditions, it will display an error.
     else :
         print("Function not compatible with the current os.")
+
+def get_key() :
+    pass

@@ -1,5 +1,6 @@
 # Import modules
 from copy import deepcopy
+from pynput import keyboard as kb
 import keyboard
 
 # Import local modules.
@@ -12,6 +13,7 @@ list_input_box = []
 list_labels = []
 list_pointers = []
 list_screens = []
+list_selector = []
 
 
 class screen :
@@ -129,6 +131,24 @@ class label :
         for i in range(0, text_len) :
            string = self.text[i] + " "
            text_as_list.append(string.upper())
+
+        return text_as_list
+    
+    def spaced(self) :
+        """
+        Text in title style (uppercase and double space).
+        It returns the text in a list of one letter and one space per item.
+        """
+
+        # Get the lenght of the text and creates a list where every pair of letter are stored.
+        text_len = len(self.text)
+        text_as_list = []
+
+        # It iterates a range from 0 to the half of the text length.
+        # It uses the half, because it's storing all the letter by pair, not single.
+        for i in range(0, text_len) :
+           string = self.text[i] + " "
+           text_as_list.append(string)
 
         return text_as_list
 
@@ -379,6 +399,7 @@ class pointer :
                                 # It selects the new button and set the new position for the pointer.
                                 self.select_button(self.related_button)
                                 self.related_screen.layout[new_position_y][new_position_x] = self.icon
+                                break
 
                     # If key name is "down" or "right", it searches the buttons below the selected one.
                     # This only works in macOS and probably in Linux too. It's necessary find a solution for Windows.     
@@ -404,9 +425,175 @@ class pointer :
                                 # It selects the new button and set the new position for the pointer.
                                 self.select_button(self.related_button)
                                 self.related_screen.layout[new_position_y][new_position_x] = self.icon
+                                break
                 
                 #Finally, it prints the screen with the new positions.
                 self.related_screen.print_screen()
+
+class selector :
+    def __init__(self, label_source: list, label_style) :
+        list_selector.append(self)
+
+        self.label_source = label_source
+        self.label_style = label_style
+        self.position_x = 0
+        self.position_y = 0
+        self.layout = self.build_layout()
+
+        self.related_screen = None
+        self.related_label = None
+
+        self.current_index = None
+        if self.current_index == None :
+            self.current_selection = self.label_source[0]
+        else :
+            self.current_selection = self.label_source[self.current_index]
+
+    def build_layout(self) :
+        max_len = 0
+        for item in self.label_source :
+            test_label = label(item, self.label_style)
+            text_as_list = test_label.style(test_label)
+            
+            text_to_analize = ""
+            for each in text_as_list :
+                text_to_analize += each
+            
+            item_len = len(text_to_analize)
+            if item_len > max_len :
+                max_len = item_len
+            
+            del test_label
+        
+        max_len += 2
+
+       # Creates a row with the first line of the box. Size is determined by the provided at inizialization.
+        line1 = " ____"
+        line1_end = "____ "
+        for i in range(0, max_len) :
+            line1 += "_"
+        line1 += line1_end
+
+        # Creates a row with the second line of the box. Size is determined by the provided at inizialization.
+        line2 = "⎢ < |"
+        line2_end = "| > ⎪"
+        for i in range(0, max_len) :
+            line2 += " "
+        line2 += line2_end
+
+        # Creates a row with the third line of the box. Size is determined by the provided at inizialization.
+        line3 = " ⎺⎺⎺⎺"
+        line3_end = "⎺⎺⎺⎺ "
+        for i in range(0, max_len) :
+            line3 += "⎺"
+        line3 += line3_end
+
+        lines = [line1, line2, line3]
+
+        box = []
+        for line in lines :
+            line_len = len(line)
+            row = []
+            for i in range(0, line_len // 2) :
+                a = i * 2
+                b = a + 1
+
+                string = line[a] + line[b]
+                row.append(string)
+
+            if line_len // 2 != line_len / 2 :
+                string = line[line_len - 1] + " "
+                row.append(string)
+
+            box.append(row)             
+        
+        return box
+    
+    def set_in_screen(self, relative_label: object) :
+        """
+        It sets the textbox in the screen according to the postion of the label in the screen.
+        A label has to be provided. 
+        """
+
+        self.related_label = relative_label
+        self.related_screen = relative_label.related_screen
+
+        label_len = len(relative_label.text)
+        if label_len //2 != label_len / 2 :
+            label_len = label_len + 1
+        label_relative_len = label_len / 2
+            
+        self.position_x = relative_label.position_x + int(label_relative_len) + 1
+        self.position_y = relative_label.position_y
+
+        # Set default value "0" in selector.
+        if self.current_index == None :
+            self.set_label_in_selector(0)
+        else :
+            self.set_label_in_selector(self.current_index)
+
+        try :
+            row_counter = -1
+            for row in self.layout :
+                for i in range(0, len(row)) :
+                    self.related_screen.layout[self.position_y + row_counter][self.position_x + i] = row[i]
+                row_counter += 1
+        except :
+            print(bold.red+"Error: "+text.end+"The size of the textbox is larger than the screen layout.")
+            exit()
+
+    def set_label_in_selector(self, label_index: int) :
+        self.current_index = label_index
+        current_label = label(self.current_selection, label.spaced)
+        
+        selector_len = len(self.layout[0])
+        text_len = len(current_label.text)
+
+        center_position_x = selector_len // 2
+        text_half = text_len // 2
+
+        text_init_position_x = center_position_x - text_half
+
+        text_as_list = current_label.style(current_label)
+        for i in range(0, len(text_as_list)) :
+            self.layout[1][text_init_position_x + i] = text_as_list[i]
+        
+        del current_label
+    
+    def change_selection(self) :
+        options_quantity = len(self.label_source)
+        max_index = options_quantity - 1
+
+        while True :
+            key = keyboard.read_event()
+        
+            if key.name == "esc" :
+                exit()
+            if key.name == "up" or key.name == "down" :
+                return
+            if key.event_type == keyboard.KEY_DOWN :
+                match key.name :
+                    case "left" :
+                        new_index = self.current_index - 1
+                        if new_index < 0 :
+                            new_index = max_index
+
+                            self.set_label_in_selector(new_index)
+                            self.set_in_screen(self.related_label)
+                            print(self.layout)
+                            input()
+                    case "right" :
+                        new_index = self.current_index + 1
+                        if new_index > max_index :
+                            new_index = 0
+
+                            self.set_label_in_selector(new_index)
+                            self.set_in_screen(self.related_label)
+                            print(self.layout)
+                            input()
+            
+                self.related_screen.print_screen()
+
 
 class textbox :
     """
@@ -527,6 +714,7 @@ class textbox :
 
         while True :
             key = keyboard.read_event()
+            key2 = keyboard.read_key()
 
             if key.event_type == keyboard.KEY_DOWN and key.name is not None :
                 if key.name.isalnum() :
@@ -538,4 +726,6 @@ class textbox :
                     return
                 elif key.name == "delete":
                     pass
-            print(bold.red + self.value + text.end) #Solo con el fin de identificar qué valor se está almacenando.
+            
+            print(bold.red + str(key.name) + text.end) #Solo con el fin de identificar qué valor se está almacenando.
+            print(key2)

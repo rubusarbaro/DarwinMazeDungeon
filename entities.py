@@ -1,4 +1,6 @@
-class character(object):
+list_entities = []
+
+class character(object) :
     """
     Initialize an object of "character" class.
     The main type of characters are: "player" and "npc".
